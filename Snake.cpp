@@ -2,8 +2,14 @@
 #include <time.h>
 #include <vector>
 #include <cstdlib>
+#include <ncurses.h>
+#include <unistd.h>
+#include <random>
 
-int gridsize = 20;
+int gridsize = 30;
+int upper = gridsize-4;
+int lower = 4;
+
 typedef enum {
     up,
     down,
@@ -34,6 +40,7 @@ public:
     void move();
     void moveupdate(directionT);
     void print();
+    int getScore();
 };
 
 cdT::cdT(){};
@@ -60,8 +67,8 @@ void Snake::createTarget()
     int i = 0;
     while(same)
     {
-        this->apple.x = rand() % (gridsize-1) + 2;
-        this->apple.y = rand() % (gridsize-1) + 2;
+        this->apple.x = (rand() % (upper - lower + 1)) + lower;
+        this->apple.y = (rand() % (upper - lower + 1)) + lower;
         for (i = 0; i < this->snake_body_vector->size(); i++)
         {
             if (this->snake_body_vector->at(i)->x == this->apple.x
@@ -118,8 +125,7 @@ bool Snake::collided(){
 
 bool Snake::collidedWithApple()
 {
-    if (this->head.x == this->apple.x
-        && this->head.y == this->apple.y) return true;
+    if (this->head.y == this->apple.y && this->head.x == this->apple.x) return true;
     else return false;
 }
 
@@ -141,7 +147,11 @@ void Snake::grow(){
         coordinate->x = this->head.x - 1;
         coordinate->y = this->head.y;
     }
+    //coordinate = &(this->apple);
+    //this->snake_body_vector->at(this->snake_body_vector->size()-1) = coordinate;
+    //this->snake_body_vector->push_back(&(this->apple));
     this->snake_body_vector->push_back(coordinate);
+    //this->head = this->apple;
     this->head = *(this->snake_body_vector->at(this->snake_body_vector->size()-1));
 }
 
@@ -155,9 +165,9 @@ void Snake::print()
     {
         found = false;
         //reached the end of the grid
-        if (i == gridsize)
+        if (i == gridsize-1)
         {
-            printf("\n");
+            printf("\n\r");
             j++;
             i = 0;
         }
@@ -169,22 +179,27 @@ void Snake::print()
                 if (i == this->snake_body_vector->at(v)->x 
                     && j == this->snake_body_vector->at(v)->y)
                 {
-                    printf("o");
+                    printf("O ");
                     found = true;
                     break;
                 }
                 else if (i == this->apple.x && j == this->apple.y)
                 {
-                    printf("A");
+                    printf("A ");
                     found = true;
                     break;
                 }
                 else v++;
             }
         }
-        if (!found) printf("-");
+        if (!found && j != 0) printf("- ");
         i++;
     }
+}
+
+int Snake::getScore()
+{
+    return (int)this->snake_body_vector->size();
 }
 
 void clrScreen(int stuff){
@@ -194,33 +209,70 @@ void clrScreen(int stuff){
     }
 }
 
+void initGame()
+{
+    printf("    _________            _________\n");
+    printf("        |      |       | |        \n");
+    printf("        |      |_______| |________\n");
+    printf("        |      |       | |        \n");
+    printf("        |      |       | |________\n");
+    printf("\n");
+    printf("     ________                       ______\n");
+    printf("    |         |\"   |    /\"   | / |      \n");
+    printf("    |________ | \"  |   /  \"  |/  |______\n");
+    printf("            | |  \" |  /    \" |\" |      \n");
+    printf("     _______| |   \"| /      \"| \"|______\n");
+    printf("\n\n\n\n");
+    printf("    Press Enter To Start!\n");
+    getchar();
+}
+
 int main(void){
+    initGame();
     Snake* Fred_The_Snake = new Snake(8);
+    initscr();
+    cbreak();
+    nodelay(stdscr, TRUE);
     Fred_The_Snake->createTarget();
     directionT dir;
-    while (!Fred_The_Snake->collided()){
+    double time = 0;
+    clock_t c_time = clock();
+    clock_t p_time = c_time;
+    while (!Fred_The_Snake->collided())
+    {
         Fred_The_Snake->print();
         char input;
-        scanf("%s", &input);
-        if (input == 'w'){
-            dir = up;
-            Fred_The_Snake->moveupdate(dir);
-        }
-        else if(input == 'a'){
-            dir = left;
-            Fred_The_Snake->moveupdate(dir);
-        }
-        else if(input == 's'){
-            dir = down;
-            Fred_The_Snake->moveupdate(dir);
-        }
-        else if(input == 'd'){
-            dir = right;
-            Fred_The_Snake->moveupdate(dir);
-        }
-        else{
-            printf("Ended\n");
-            return 1;
+        usleep(100000);
+        if ((input = getch()) != ERR)
+        {
+
+            if (input == 'w')
+            {
+                dir = up;
+                Fred_The_Snake->moveupdate(dir);
+            }
+            else if(input == 'a')
+            {
+                dir = left;
+                Fred_The_Snake->moveupdate(dir);
+            }
+            else if(input == 's')
+            {
+                dir = down;
+                Fred_The_Snake->moveupdate(dir);
+            }
+            else if(input == 'd')
+            {
+                dir = right;
+                Fred_The_Snake->moveupdate(dir);
+            }
+            else
+            {
+                endwin();
+                printf("Ended\n\r");
+                return 1;
+            }
+            //char input=' ';
         }
         Fred_The_Snake->move();
         if (Fred_The_Snake->collidedWithApple())
@@ -229,10 +281,13 @@ int main(void){
             Fred_The_Snake->createTarget();
         }
         clrScreen(120);
-        printf("head   %d    %d\n", Fred_The_Snake->head.x, Fred_The_Snake->head.y);
-        printf("apple  %d    %d\n", Fred_The_Snake->apple.x, Fred_The_Snake->apple.y);
-        printf("length %d\n", (int)Fred_The_Snake->snake_body_vector->size());
+        printf("\n\r");
+        printf("head   %d    %d\n\r", Fred_The_Snake->head.x, Fred_The_Snake->head.y);
+        printf("apple  %d    %d\n\r", Fred_The_Snake->apple.x, Fred_The_Snake->apple.y);
+        printf("length %d\n\r", (int)Fred_The_Snake->snake_body_vector->size());
     }
-    printf("You died\n");
+    endwin();
+    printf("You died\n\r");
+    printf("Score: %d\n\r", Fred_The_Snake->getScore());
     return 0;
 }
