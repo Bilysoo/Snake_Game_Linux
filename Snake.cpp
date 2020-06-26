@@ -247,11 +247,11 @@ void printgamename()
     printf("               O      O       O  O        \n\r");
     printf("               O      O       O  OOOOOOOOO\n\r");
     printf("\n\r");
-    printf("     OOOOOOOO  O    O      O      O   O  OOOOOOO\n\r");
-    printf("     O         OO   O     O O     O  O   O      \n\r");
-    printf("     OOOOOOOO  O O  O    O   O    O O    OOOOOOO\n\r");
-    printf("            O  O  O O   O     O   O  O   O      \n\r");
-    printf("     OOOOOOOO  O   OO  O       O  O   O  OOOOOOO\n\r");
+    printf("     OOOOOOOO  OO    O      O      O   O  OOOOOOO\n\r");
+    printf("     O         O O   O     O O     O  O   O      \n\r");
+    printf("     OOOOOOOO  O  O  O    O   O    O O    OOOOOOO\n\r");
+    printf("            O  O   O O   O     O   O  O   O      \n\r");
+    printf("     OOOOOOOO  O    OO  O       O  O   O  OOOOOOO\n\r");
     printf("\n\r\n\r");
     printf("********************* By John Jung *********************\n\r");
     printf("\n\r\n\r\n\r\n\r");
