@@ -9,19 +9,13 @@
 int gridsize = 30;
 int upper = gridsize-4;
 int lower = 4;
+int gamecount = 0;
 
-typedef enum {
-    gamestart,
-    ingame;
-    gameend;
-} stateT;
-
-typedef enum {
-    up,
-    down,
-    left,
-    right
-} directionT;
+//game states (later used as arguments for a state machine)
+typedef enum { start, pregame, controls, ingame, stopped, end } stateT;
+//the four directions to indicate where the snake is moving 
+//made for a 2 dimensional space
+typedef enum { up, down, left, right } directionT;
 
 class cdT{
 private:
@@ -242,85 +236,219 @@ void clrScreen(int stuff)
     {
         printf("\n");
     }
+    printf("\r");
 }
 
-void initGame()
+void printgamename()
 {
-    printf("    _________            _________\n");
-    printf("        |      |       | |        \n");
-    printf("        |      |_______| |________\n");
-    printf("        |      |       | |        \n");
-    printf("        |      |       | |________\n");
-    printf("\n");
-    printf("     ________                       ______\n");
-    printf("    |         |\"   |    /\"   | / |      \n");
-    printf("    |________ | \"  |   /  \"  |/  |______\n");
-    printf("            | |  \" |  /    \" |\" |      \n");
-    printf("     _______| |   \"| /      \"| \"|______\n");
-    printf("\n\n\n\n");
-    printf("    Press Enter To Start!\n");
-    getchar();
+    printf("    _________            _________\n\r");
+    printf("        |      |       | |        \n\r");
+    printf("        |      |_______| |________\n\r");
+    printf("        |      |       | |        \n\r");
+    printf("        |      |       | |________\n\r");
+    printf("\n\r");
+    printf("     ________                       ______\n\r");
+    printf("    |         |\"   |    /\"   | / |      \n\r");
+    printf("    |________ | \"  |   /  \"  |/  |______\n\r");
+    printf("            | |  \" |  /    \" |\" |      \n\r");
+    printf("     _______| |   \"| /      \"| \"|______\n\r");
+    printf("\n\r\n\r\n\r\n\r");
 }
 
-int main(void){
-    initGame();
-    /* Create the snake here with the default starting length of 8. */
-    Snake* Fred_The_Snake = new Snake(8);
-    initscr();
-    cbreak();
-    nodelay(stdscr, TRUE);
-    Fred_The_Snake->createApple();
-    directionT dir;
-    double time = 0;
-    clock_t c_time = clock();
-    clock_t p_time = c_time;
-    while (!Fred_The_Snake->CollidedIntoWall())
+stateT controlsMenu()
+{
+    stateT newstate;
+    clrScreen(120);
+    printf("    Controls:\n\r");
+    printf("    UP:    w\n\r");
+    printf("    DOWN:  s\n\r");
+    printf("    LEFT:  a\n\r");
+    printf("    RIGHT: d\n\r");
+    printf("    QUIT:  q\n\r");
+    printf("\n\r\n\r");
+    printf("    Press 1 to return to manu\n\r");
+    char input;
+    input = getchar();
+    while (true)
     {
-        Fred_The_Snake->print();
-        char input;
-        usleep(100000);
-        if ((input = getch()) != ERR)
+        switch(input)
         {
-            /* Here, I devised cases for keyboard inputs
-               For instance, the controls coming from the user
-               include w, a, s, d and they denote the direction
-               that the snake will travel after the input has 
-               been received. */
-            switch(input)
-            {
-                case 'w':
-                    dir = up;
-                    break;
-                case 'a':
-                    dir = left;
-                    break;
-                case 's':
-                    dir = down;
-                    break;
-                case 'd':
-                    dir = right;
-                    break;
-                case 'q': //press q to quit.
-                    endwin();
-                    printf("Ended\n\r");
-                    return 1;
-            }
-            Fred_The_Snake->changeDirection(dir);
-        }
-        Fred_The_Snake->move();
-        if (Fred_The_Snake->AteApple())
-        {
-            Fred_The_Snake->grow();
-            Fred_The_Snake->createApple();
-        }
-        clrScreen(120);
-        printf("\n\r");
-        printf("head   %d    %d\n\r", Fred_The_Snake->head.x, Fred_The_Snake->head.y);
-        printf("apple  %d    %d\n\r", Fred_The_Snake->apple.x, Fred_The_Snake->apple.y);
-        printf("length %d\n\r", (int)Fred_The_Snake->snake_body_vector->size());
+            case '1':
+                return start;
+            default:
+                input = getchar();
+                break;
+        }    
     }
-    endwin();
-    printf("You died\n\r");
-    printf("Score: %d\n\r", Fred_The_Snake->getScore());
-    return 0;
+}
+
+stateT initGame()
+{
+    clrScreen(120);
+    printgamename();
+    printf("           Main Menu:\n\r");
+    printf("    Start Game       Quit       Controls\n\r");
+    printf("      Press 1       Press 2      Press 3\n\r");
+    char input;
+    input = getchar();
+    while (true)
+    {
+        switch(input)
+        {
+            case '1':
+                return pregame;
+            case '2':
+                return end;
+            case '3':
+                return controls;
+            default:
+            	input = getchar();
+            	break;
+        }
+    }
+}
+
+stateT initPauseScreen()
+{
+    printf("           Pause Menu:\n\r");
+    printf("    Continue        Quit          Return To Start\n\r");
+    printf("    Press 1        Press 2            Press 3\n\r");
+
+    char input;
+    input = getch();
+    while (true)
+    {
+        switch(input)
+        {
+        case '1':
+            return ingame;
+        case '2':
+            return end;
+        case '3':
+            return start;
+        default:
+            input = getch();
+            break;
+        }    
+    }
+    
+}
+
+int main(void)
+{
+    stateT gamestate = start;
+    Snake* Fred_The_Snake = new Snake(8);
+    cbreak();
+    initscr();
+    while (true)
+    {
+        switch(gamestate)
+        {
+            case start:
+            {
+                if (gamecount > 0) Fred_The_Snake = new Snake(8);
+                gamestate = initGame();
+                gamecount = 1;
+                break;
+            }
+
+            case controls:
+            {
+                gamestate = controlsMenu();
+                break;
+            }
+
+            case pregame:
+            {
+                /* Create the snake here with the default starting length of 8. */
+                Fred_The_Snake->createApple();
+                Fred_The_Snake->print();
+                gamestate = ingame;
+                break;
+            }
+
+            case ingame:
+            {
+                directionT dir;
+                nodelay(stdscr, TRUE);
+                while (!Fred_The_Snake->CollidedIntoWall())
+                {
+                    Fred_The_Snake->print();
+                    char input;
+                    usleep(130000);
+                    if ((input = getch()) != ERR)
+                    {
+                        /* Here, I devised cases for keyboard inputs
+                        For instance, the controls coming from the user
+                        include w, a, s, d and they denote the direction
+                        that the snake will travel after the input has 
+                        been received. */
+                        switch(input)
+                        {
+                            case 'w':
+                                dir = up;
+                                break;
+                            case 'a':
+                                dir = left;
+                                break;
+                            case 's':
+                                dir = down;
+                                break;
+                            case 'd':
+                                dir = right;
+                                break;
+                            case 'q': //press q to quit.
+                                gamestate = end;
+                                break;
+                            case 'p':
+                            {
+                                gamestate = stopped;
+                                break;
+                            }
+                        }
+                        //if the user chooses to end the game, then exit the while loop
+                        if (gamestate == end || gamestate == stopped) break;
+                        Fred_The_Snake->changeDirection(dir);
+                    }
+                    Fred_The_Snake->move();
+                    if (Fred_The_Snake->AteApple())
+                    {
+                        Fred_The_Snake->grow();
+                        Fred_The_Snake->createApple();
+                    }
+                    clrScreen(120);
+                    printf("\n\r");
+                    printf("head   %d    %d\n\r", Fred_The_Snake->head.x, Fred_The_Snake->head.y);
+                    printf("apple  %d    %d\n\r", Fred_The_Snake->apple.x, Fred_The_Snake->apple.y);
+                    printf("length %d\n\r", (int)Fred_The_Snake->snake_body_vector->size());
+                }
+                if (gamestate != end && gamestate != stopped)
+                {
+                	clrScreen(120);
+                    printf("Snake died\n\r");
+                    printf("Score: %d\n\r", Fred_The_Snake->getScore());
+                    gamestate = start;
+                }
+                nodelay(stdscr, FALSE);
+                break;
+            }
+
+            case stopped:
+            {
+                nodelay(stdscr, FALSE);
+                gamestate = initPauseScreen();
+                break;
+            }
+
+            case end:
+            {
+                endwin();
+                printf("Ended\n\r");
+                printf("Score: %d\n\r", Fred_The_Snake->getScore());
+                return 0;   
+            }
+        }
+    }
+    printf("Game Error: Halt\n\r");
+    return 1;
 }
