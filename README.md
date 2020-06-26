@@ -18,11 +18,12 @@ when trying to change the direction that the snake travels.
 This way, it actually feels like a realistic game rather than a terminal program. 
 
 The program can be compiled in a UNIX/LINUX environment using g++. 
-However, the curses library must be installed on the operating system prior to compilation 
+However, the g++ compiler and the curses library must be installed on the operating system prior to compilation 
 and link the library in the compilation command. 
 
 If you're unsure, you could use these commands below to compile my game source code:
 
+$ sudo apt install g++
 
 $ sudo apt-get install libncurses5-dev libncursesw5-dev
 
