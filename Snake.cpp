@@ -266,7 +266,7 @@ stateT controlsMenu()
     printf("    RIGHT: d\n\r");
     printf("    QUIT:  q\n\r");
     printf("\n\r\n\r");
-    printf("    Press 1 to return to manu\n\r");
+    printf("    Press 1 to return to menu\n\r");
     char input;
     input = getchar();
     while (true)
@@ -375,7 +375,7 @@ int main(void)
                 {
                     Fred_The_Snake->print();
                     char input;
-                    usleep(130000);
+                    usleep(100000);
                     if ((input = getch()) != ERR)
                     {
                         /* Here, I devised cases for keyboard inputs
