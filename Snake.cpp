@@ -11,11 +11,18 @@ int upper = gridsize-4;
 int lower = 4;
 
 typedef enum {
+    gamestart,
+    ingame;
+    gameend;
+} stateT;
+
+typedef enum {
     up,
     down,
     left,
     right
 } directionT;
+
 class cdT{
 private:
 public:
@@ -33,22 +40,29 @@ public:
 	cdT head;
 	std::vector<cdT*> *snake_body_vector;
     cdT apple;
-	bool collided();
-    bool collidedWithApple();
-    void createTarget();
+	bool CollidedIntoWall();
+    bool AteApple();
+    void createApple();
 	void grow();
     void move();
-    void moveupdate(directionT);
+    void changeDirection(directionT);
+    /* The print function outputs what would be the screen for the game.
+    It works by printing out the grid that the snake moves on, until it
+    finds a coordinate in which any part of the snake's body exists.
+    If the coordinate of the current place matches the snake's body,
+    it prints out the snake with an "oh." */
     void print();
     int getScore();
 };
 
 cdT::cdT(){};
 
-Snake::Snake(int length){
+Snake::Snake(int length)
+{
     int i;
     this->snake_body_vector = new std::vector <cdT*> ();
-	for (i = 1; i <= length; i++){
+	for (i = 1; i <= length; i++)
+    {
         cdT* coordinate = new cdT();
 		coordinate->x = i;
 		coordinate->y = 1;
@@ -60,7 +74,7 @@ Snake::Snake(int length){
 	this->head = *(this->snake_body_vector->at(this->snake_body_vector->size()-1));
 }
 
-void Snake::createTarget()
+void Snake::createApple()
 {
     srand(time(NULL));
     bool same = true;
@@ -87,32 +101,37 @@ void Snake::createTarget()
 
 void Snake::move(){
 	cdT* coordinate = new cdT();
-    if (this->direction == up){
-        coordinate->x = this->head.x;
-        coordinate->y = this->head.y - 1;
-    }
-    else if (this->direction == down){
-        coordinate->x = this->head.x;
-        coordinate->y = this->head.y + 1;
-    }
-    else if (this->direction == right){
-        coordinate->x = this->head.x + 1;
-        coordinate->y = this->head.y;
-    }
-    else{
-        coordinate->x = this->head.x - 1;
-        coordinate->y = this->head.y;
+    switch(this->direction)
+    {
+        case up:
+            coordinate->x = this->head.x;
+            coordinate->y = this->head.y - 1;
+            break;
+        case down:
+            coordinate->x = this->head.x;
+            coordinate->y = this->head.y + 1;
+            break;
+        case right:
+            coordinate->x = this->head.x + 1;
+            coordinate->y = this->head.y;
+            break;
+        case left:
+            coordinate->x = this->head.x - 1;
+            coordinate->y = this->head.y;
+            break;
     }
     this->snake_body_vector->push_back(coordinate);
     this->head = *(this->snake_body_vector->at(this->snake_body_vector->size()-1));
     this->snake_body_vector->erase(this->snake_body_vector->begin());
 }
 
-void Snake::moveupdate(directionT newdirection){
+void Snake::changeDirection(directionT newdirection)
+{
     this->direction = newdirection;
 }
 
-bool Snake::collided(){
+bool Snake::CollidedIntoWall()
+{
     for (int i = 0; i < this->snake_body_vector->size()-1; i++)
     {
         if (this->head.x == this->snake_body_vector->at(i)->x
@@ -123,35 +142,35 @@ bool Snake::collided(){
     else return false;
 }
 
-bool Snake::collidedWithApple()
+bool Snake::AteApple()
 {
     if (this->head.y == this->apple.y && this->head.x == this->apple.x) return true;
     else return false;
 }
 
-void Snake::grow(){
+void Snake::grow()
+{
     cdT* coordinate = new cdT();
-    if (this->direction == up){
-        coordinate->x = this->head.x;
-        coordinate->y = this->head.y - 1;
+    switch(this->direction)
+    {
+        case up:
+            coordinate->x = this->head.x;
+            coordinate->y = this->head.y - 1;
+            break;
+        case down:
+            coordinate->x = this->head.x;
+            coordinate->y = this->head.y + 1;
+            break;
+        case right:
+            coordinate->x = this->head.x + 1;
+            coordinate->y = this->head.y;
+            break;
+        case left:
+            coordinate->x = this->head.x - 1;
+            coordinate->y = this->head.y;
+            break;
     }
-    else if (this->direction == down){
-        coordinate->x = this->head.x;
-        coordinate->y = this->head.y + 1;
-    }
-    else if (this->direction == right){
-        coordinate->x = this->head.x + 1;
-        coordinate->y = this->head.y;
-    }
-    else{
-        coordinate->x = this->head.x - 1;
-        coordinate->y = this->head.y;
-    }
-    //coordinate = &(this->apple);
-    //this->snake_body_vector->at(this->snake_body_vector->size()-1) = coordinate;
-    //this->snake_body_vector->push_back(&(this->apple));
     this->snake_body_vector->push_back(coordinate);
-    //this->head = this->apple;
     this->head = *(this->snake_body_vector->at(this->snake_body_vector->size()-1));
 }
 
@@ -159,8 +178,8 @@ void Snake::print()
 {
     int i = 0;//column
     int j = 0;//row
-    int v = 0;
-    bool found;
+    int v = 0;//index of the vector
+    bool found;//flag for body of the snake
     while (j != gridsize-1)
     {
         found = false;
@@ -179,7 +198,18 @@ void Snake::print()
                 if (i == this->snake_body_vector->at(v)->x 
                     && j == this->snake_body_vector->at(v)->y)
                 {
-                    printf("O ");
+                    /* If the current coordinate if where the head
+                       exists, then we print the big-oh instead to
+                       indicate the head of the snake, separate
+                       from the rest of the snake's body */
+                    if (this->head.x == i && this->head.y == j)
+                    {
+                        printf("@ ");
+                    }
+                    /* If the current coordinate is not a head, 
+                    then print a small-oh in order to indicate
+                    that it's a body of the snake. */
+                    else printf("o ");
                     found = true;
                     break;
                 }
@@ -192,7 +222,10 @@ void Snake::print()
                 else v++;
             }
         }
-        if (!found && j != 0) printf("- ");
+        /*If the coordinate neither has the body of the snake
+        nor it is the first line, print the a dash in order
+        to indicate that it's a grid not the snake. */
+        if (!found && j != 0 && i != 0) printf("- ");
         i++;
     }
 }
@@ -202,9 +235,11 @@ int Snake::getScore()
     return (int)this->snake_body_vector->size();
 }
 
-void clrScreen(int stuff){
+void clrScreen(int stuff)
+{
     printf("Press q to quit\n");
-    for (int i = 0; i < stuff; i++){
+    for (int i = 0; i < stuff; i++)
+    {
         printf("\n");
     }
 }
@@ -229,56 +264,54 @@ void initGame()
 
 int main(void){
     initGame();
+    /* Create the snake here with the default starting length of 8. */
     Snake* Fred_The_Snake = new Snake(8);
     initscr();
     cbreak();
     nodelay(stdscr, TRUE);
-    Fred_The_Snake->createTarget();
+    Fred_The_Snake->createApple();
     directionT dir;
     double time = 0;
     clock_t c_time = clock();
     clock_t p_time = c_time;
-    while (!Fred_The_Snake->collided())
+    while (!Fred_The_Snake->CollidedIntoWall())
     {
         Fred_The_Snake->print();
         char input;
         usleep(100000);
         if ((input = getch()) != ERR)
         {
-
-            if (input == 'w')
+            /* Here, I devised cases for keyboard inputs
+               For instance, the controls coming from the user
+               include w, a, s, d and they denote the direction
+               that the snake will travel after the input has 
+               been received. */
+            switch(input)
             {
-                dir = up;
-                Fred_The_Snake->moveupdate(dir);
+                case 'w':
+                    dir = up;
+                    break;
+                case 'a':
+                    dir = left;
+                    break;
+                case 's':
+                    dir = down;
+                    break;
+                case 'd':
+                    dir = right;
+                    break;
+                case 'q': //press q to quit.
+                    endwin();
+                    printf("Ended\n\r");
+                    return 1;
             }
-            else if(input == 'a')
-            {
-                dir = left;
-                Fred_The_Snake->moveupdate(dir);
-            }
-            else if(input == 's')
-            {
-                dir = down;
-                Fred_The_Snake->moveupdate(dir);
-            }
-            else if(input == 'd')
-            {
-                dir = right;
-                Fred_The_Snake->moveupdate(dir);
-            }
-            else
-            {
-                endwin();
-                printf("Ended\n\r");
-                return 1;
-            }
-            //char input=' ';
+            Fred_The_Snake->changeDirection(dir);
         }
         Fred_The_Snake->move();
-        if (Fred_The_Snake->collidedWithApple())
+        if (Fred_The_Snake->AteApple())
         {
             Fred_The_Snake->grow();
-            Fred_The_Snake->createTarget();
+            Fred_The_Snake->createApple();
         }
         clrScreen(120);
         printf("\n\r");
