@@ -241,23 +241,24 @@ void clrScreen(int stuff)
 
 void printgamename()
 {
-    printf("    _________            _________\n\r");
-    printf("        |      |       | |        \n\r");
-    printf("        |      |_______| |________\n\r");
-    printf("        |      |       | |        \n\r");
-    printf("        |      |       | |________\n\r");
+    printf("           OOOOOOOO0  O       O  OOOOOOOOO\n\r");
+    printf("               O      O       O  O        \n\r");
+    printf("               O      OOOOOOOOO  OOOOOOOOO\n\r");
+    printf("               O      O       O  O        \n\r");
+    printf("               O      O       O  OOOOOOOOO\n\r");
     printf("\n\r");
-    printf("     ________                       ______\n\r");
-    printf("    |         |\"   |    /\"   | / |      \n\r");
-    printf("    |________ | \"  |   /  \"  |/  |______\n\r");
-    printf("            | |  \" |  /    \" |\" |      \n\r");
-    printf("     _______| |   \"| /      \"| \"|______\n\r");
+    printf("     OOOOOOOO  O    O      O      O   O  OOOOOOO\n\r");
+    printf("     O         OO   O     O O     O  O   O      \n\r");
+    printf("     OOOOOOOO  O O  O    O   O    O O    OOOOOOO\n\r");
+    printf("            O  O  O O   O     O   O  O   O      \n\r");
+    printf("     OOOOOOOO  O   OO  O       O  O   O  OOOOOOO\n\r");
+    printf("\n\r\n\r");
+    printf("                    By John Jung\n\r");
     printf("\n\r\n\r\n\r\n\r");
 }
 
 stateT controlsMenu()
 {
-    stateT newstate;
     clrScreen(120);
     printf("    Controls:\n\r");
     printf("    UP:    w\n\r");
@@ -286,7 +287,7 @@ stateT initGame()
 {
     clrScreen(120);
     printgamename();
-    printf("           Main Menu:\n\r");
+    printf("                Main Menu:\n\r");
     printf("    Start Game       Quit       Controls\n\r");
     printf("      Press 1       Press 2      Press 3\n\r");
     char input;
@@ -310,7 +311,7 @@ stateT initGame()
 
 stateT initPauseScreen()
 {
-    printf("           Pause Menu:\n\r");
+    printf("                   Pause Menu:\n\r");
     printf("    Continue        Quit          Return To Start\n\r");
     printf("    Press 1        Press 2            Press 3\n\r");
 
