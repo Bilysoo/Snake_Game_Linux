@@ -253,21 +253,21 @@ void printgamename()
     printf("            O  O  O O   O     O   O  O   O      \n\r");
     printf("     OOOOOOOO  O   OO  O       O  O   O  OOOOOOO\n\r");
     printf("\n\r\n\r");
-    printf("                    By John Jung\n\r");
+    printf("********************* By John Jung *********************\n\r");
     printf("\n\r\n\r\n\r\n\r");
 }
 
 stateT controlsMenu()
 {
     clrScreen(120);
-    printf("    Controls:\n\r");
-    printf("    UP:    w\n\r");
-    printf("    DOWN:  s\n\r");
-    printf("    LEFT:  a\n\r");
-    printf("    RIGHT: d\n\r");
-    printf("    QUIT:  q\n\r");
+    printf("************** Controls **************\n\r");
+    printf("             UP:     w\n\r");
+    printf("             DOWN:   s\n\r");
+    printf("             LEFT:   a\n\r");
+    printf("             RIGHT:  d\n\r");
+    printf("             PAUSE:  p\n\r");
     printf("\n\r\n\r");
-    printf("    Press 1 to return to menu\n\r");
+    printf("       Press 1 to return to menu\n\r");
     char input;
     input = getchar();
     while (true)
@@ -287,9 +287,9 @@ stateT initGame()
 {
     clrScreen(120);
     printgamename();
-    printf("                Main Menu:\n\r");
-    printf("    Start Game       Quit       Controls\n\r");
-    printf("      Press 1       Press 2      Press 3\n\r");
+    printf("********************** Main Menu ***********************\n\r");
+    printf("       START GAME        QUIT           CONTROLS\n\r");
+    printf("         Press 1        Press 2          Press 3\n\r");
     char input;
     input = getchar();
     while (true)
@@ -311,9 +311,9 @@ stateT initGame()
 
 stateT initPauseScreen()
 {
-    printf("                   Pause Menu:\n\r");
-    printf("    Continue        Quit          Return To Start\n\r");
-    printf("    Press 1        Press 2            Press 3\n\r");
+    printf("********************* Pause Menu *********************\n\r");
+    printf("    CONTINUE           QUIT         RETURN TO MENU\n\r");
+    printf("     Press 1          Press 2           Press 3\n\r");
 
     char input;
     input = getch();
@@ -397,9 +397,6 @@ int main(void)
                                 break;
                             case 'd':
                                 dir = right;
-                                break;
-                            case 'q': //press q to quit.
-                                gamestate = end;
                                 break;
                             case 'p':
                             {
