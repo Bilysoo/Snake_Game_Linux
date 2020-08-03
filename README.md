@@ -23,11 +23,11 @@ and link the library in the compilation command.
 
 If you're unsure, you could use these commands below to compile my game source code:
 
-$ sudo apt install g++
+```$ sudo apt install g++```
 
-$ sudo apt-get install libncurses5-dev libncursesw5-dev
+```$ sudo apt-get install libncurses5-dev libncursesw5-dev```
 
-$ g++ -std=c++11 -o The_Snake_Game Snake.cpp -lncurses
+```$ g++ -std=c++11 -o The_Snake_Game Snake.cpp -lncurses```
 
 These commands will produce an executable called "The_Snake_Game" which is the game executable. 
 Run this executable and you're good to go!
